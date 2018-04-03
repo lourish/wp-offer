@@ -75,6 +75,29 @@ public class OfferAssert extends AbstractObjectAssert<OfferAssert, Offer> {
   }
 
   /**
+   * Verifies that the actual Offer's expires is equal to the given one.
+   * @param expires the given expires to compare the actual Offer's expires to.
+   * @return this assertion object.
+   * @throws AssertionError - if the actual Offer's expires is not equal to the given one.
+   */
+  public OfferAssert hasExpires(java.time.LocalDateTime expires) {
+    // check that actual Offer we want to make assertions on is not null.
+    isNotNull();
+
+    // overrides the default error message with a more explicit one
+    String assertjErrorMessage = "\nExpecting expires of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+    // null safe check
+    java.time.LocalDateTime actualExpires = actual.getExpires();
+    if (!Objects.areEqual(actualExpires, expires)) {
+      failWithMessage(assertjErrorMessage, actual, expires, actualExpires);
+    }
+
+    // return the current assertion for method chaining
+    return this;
+  }
+
+  /**
    * Verifies that the actual Offer's id is equal to the given one.
    * @param id the given id to compare the actual Offer's id to.
    * @return this assertion object.
@@ -114,6 +137,29 @@ public class OfferAssert extends AbstractObjectAssert<OfferAssert, Offer> {
     java.math.BigDecimal actualPrice = actual.getPrice();
     if (!Objects.areEqual(actualPrice, price)) {
       failWithMessage(assertjErrorMessage, actual, price, actualPrice);
+    }
+
+    // return the current assertion for method chaining
+    return this;
+  }
+
+  /**
+   * Verifies that the actual Offer's timeToLive is equal to the given one.
+   * @param timeToLive the given timeToLive to compare the actual Offer's timeToLive to.
+   * @return this assertion object.
+   * @throws AssertionError - if the actual Offer's timeToLive is not equal to the given one.
+   */
+  public OfferAssert hasTimeToLive(long timeToLive) {
+    // check that actual Offer we want to make assertions on is not null.
+    isNotNull();
+
+    // overrides the default error message with a more explicit one
+    String assertjErrorMessage = "\nExpecting timeToLive of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+
+    // check
+    long actualTimeToLive = actual.getTimeToLive();
+    if (actualTimeToLive != timeToLive) {
+      failWithMessage(assertjErrorMessage, actual, timeToLive, actualTimeToLive);
     }
 
     // return the current assertion for method chaining

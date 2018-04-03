@@ -1,4 +1,4 @@
-package com.lourish.wpoffer.web.service;
+package com.lourish.wpoffer.service;
 
 /**
  * Wrapper for service-level checked exceptions

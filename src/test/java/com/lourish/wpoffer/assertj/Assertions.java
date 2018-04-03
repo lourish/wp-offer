@@ -19,6 +19,17 @@ public class Assertions {
   }
 
   /**
+   * Creates a new instance of <code>{@link com.lourish.wpoffer.domain.OffersAssert}</code>.
+   *
+   * @param actual the actual value.
+   * @return the created assertion object.
+   */
+  @org.assertj.core.util.CheckReturnValue
+  public static com.lourish.wpoffer.domain.OffersAssert assertThat(com.lourish.wpoffer.domain.Offers actual) {
+    return new com.lourish.wpoffer.domain.OffersAssert(actual);
+  }
+
+  /**
    * Creates a new <code>{@link Assertions}</code>.
    */
   protected Assertions() {

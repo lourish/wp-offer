@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,7 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.lourish.wpoffer.domain.Offer;
-import com.lourish.wpoffer.web.service.OfferCommandService;
+import com.lourish.wpoffer.service.OfferCommandService;
+import com.lourish.wpoffer.test.JsonTemplates;
 
 public class CreateOfferRestControllerTest {
 
@@ -58,17 +60,16 @@ public class CreateOfferRestControllerTest {
     @Test
     public void postCreatesOffer() throws Exception {
         // given
-        String id = "an-id";
-        String description = "a description";
-        BigDecimal price = new BigDecimal("1.23");
-        String currency = "GBP";
-        Offer returnedOffer = new Offer(id, description, price, currency);
+        final String id = "an-id";
+        final String description = "a description";
+        final BigDecimal price = new BigDecimal("1.23");
+        final String currency = "GBP";
+        final LocalDateTime expires = LocalDateTime.now().plusHours(1);
+        final Offer returnedOffer = new Offer(id, description, price, currency, expires);
         given(offerCommandService.createOffer(any(Offer.class))).willReturn(returnedOffer);
 
         // when
-        mockMvc.perform(post("/offers").content(String.format("{\"desc\": \"%s\","
-                + "\"price\": \"%s\","
-                + "\"currency\":\"%s\"}", description, price.toPlainString(), currency))
+        mockMvc.perform(post("/offers").content(JsonTemplates.offer(description, price, currency, expires))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8))
 
@@ -81,7 +82,8 @@ public class CreateOfferRestControllerTest {
         verify(offerCommandService).createOffer(offerCaptor.capture());
         assertThat(offerCaptor.getValue()).hasDesc(description)
                 .hasPrice(price)
-                .hasCurrency(currency);
+                .hasCurrency(currency)
+                .hasExpires(expires);
     }
 
 }

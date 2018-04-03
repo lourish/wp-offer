@@ -21,8 +21,8 @@ A RESTful service to create 'Offers'.
 ## Assumptions
 
 1. Deployment packaging is out of scope, but the artifact must be deployable in a cloud environment
-2. An offer is a unique combination of description, price and currency (such that an MD5 hash of these fields will produce a unique identifier)
-
+1. An offer is a unique combination of description, price and currency (such that an MD5 hash of these fields will produce a unique identifier)
+1. Timezone support not required
 
 ## Prerequisites
 
