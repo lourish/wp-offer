@@ -11,10 +11,18 @@ A RESTful service to create 'Offers'.
 ### API
 
 
+### Further work
+
+1. Add logging
+1. Use an immutable object framework such as Immutables to provide good equals, hashCode and toString implementations
+1. Add source verification e.g. Checkstyle/PMD
+1. use something other than DatatypeConverter in IdGenerator in preparation for Java 9 modules
 
 ## Assumptions
 
 1. Deployment packaging is out of scope, but the artifact must be deployable in a cloud environment
+2. An offer is a unique combination of description, price and currency (such that an MD5 hash of these fields will produce a unique identifier)
+
 
 ## Prerequisites
 
