@@ -89,12 +89,6 @@ public class Offer {
         return desc;
     }
 
-    public Offer withDescription(final String val) {
-        final Offer newOffer = new Offer(this);
-        newOffer.desc = val;
-        return newOffer;
-    }
-
     public BigDecimal getPrice() {
         return price;
     }
@@ -105,6 +99,12 @@ public class Offer {
 
     public LocalDateTime getExpires() {
         return expires;
+    }
+
+    public Offer withDescription(final String val) {
+        final Offer newOffer = new Offer(this);
+        newOffer.desc = val;
+        return newOffer;
     }
 
     public Offer withPrice(final BigDecimal val) {
@@ -122,13 +122,6 @@ public class Offer {
     public Offer withId(final String val) {
         final Offer newOffer = new Offer(this);
         newOffer.id = val;
-        return newOffer;
-    }
-
-    public Offer withExpires(final LocalDateTime expiry) {
-        final Offer newOffer = new Offer(this);
-        newOffer.expires = expiry;
-        newOffer.ttl = calculateTtl(expires);
         return newOffer;
     }
 
