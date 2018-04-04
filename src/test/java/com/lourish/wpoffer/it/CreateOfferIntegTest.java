@@ -1,82 +1,90 @@
 package com.lourish.wpoffer.it;
 
 import static com.lourish.wpoffer.assertj.Assertions.assertThat;
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
-import java.net.URI;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
-import com.lourish.it.EmbeddedRedis;
-import com.lourish.wpoffer.WpOfferApplication;
 import com.lourish.wpoffer.domain.Offer;
-import com.lourish.wpoffer.repository.redis.OfferRepository;
-import com.lourish.wpoffer.test.JsonTemplates;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(properties = "server.servlet.context-path=/", classes = WpOfferApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = { EmbeddedRedis.class })
-public class CreateOfferIntegTest {
-
-    @LocalServerPort
-    private int port;
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private OfferRepository offerRepo;
-
-    @Before
-    public void setUp() {
-        restTemplate = new RestTemplate();
-    }
+public class CreateOfferIntegTest extends ApiIntegrationTestBase {
+    private static final int MILLIS_IN_SECONDS = 1000;
+    private static final String DESCRIPTION = "a description";
+    private static final BigDecimal PRICE = new BigDecimal("1.23");
+    private static final String CURRENCY = "GBP";
 
     @Test
-    public void createOffer() throws Exception {
+    public void createOffer() {
         // given
-        final String description = "a description";
-        final BigDecimal price = new BigDecimal("1.23");
-        final String currency = "GBP";
         final LocalDateTime expires = LocalDateTime.now().plusHours(1);
+
         // when
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(asList(MediaType.APPLICATION_JSON));
-        final HttpEntity<String> entity = new HttpEntity<String>(JsonTemplates.offer(description, price, currency,
-                expires),
-                headers);
-        final ResponseEntity<Offer> response = restTemplate.postForEntity(getUrl("/offers"), entity, Offer.class);
+        final Offer createdOffer = makeRequestWithExpiry(expires);
 
         // then
-        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        final Offer createdOffer = response.getBody();
-        assertThat(createdOffer.getId()).isNotNull();
-        final Optional<Offer> offerInRepo = offerRepo.findById(createdOffer.getId());
-        assertThat(offerInRepo).isPresent();
-        assertThat(offerInRepo.get()).hasDesc(description)
-                .hasCurrency(currency)
-                .hasPrice(price)
+        final Offer actualOffer = verifyOfferExists(createdOffer);
+        assertThat(actualOffer).hasDesc(DESCRIPTION)
+                .hasCurrency(CURRENCY)
+                .hasPrice(PRICE)
                 .hasExpires(expires);
     }
 
-    private URI getUrl(final String path) {
-        return URI.create("http://localhost:" + port + path);
+    @Test
+    public void multipleCallsToCreateOfferOnlyCreateOfferOnce() {
+        // given
+        final LocalDateTime expires = LocalDateTime.now().plusHours(1);
+        offerRepo.deleteAll();
+
+        // when
+        final Offer createdOffer = makeRequestWithExpiry(expires);
+        makeRequestWithExpiry(expires);
+
+        // then
+        verifyOfferExists(createdOffer);
+        assertThat(offerRepo.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void createOfferSetsTtl() {
+        // given
+        final LocalDateTime testStartTime = LocalDateTime.now();
+        final LocalDateTime expires = testStartTime.plusHours(1);
+
+        // when
+        final Offer createdOffer = makeRequestWithExpiry(expires);
+
+        // then
+        final Offer actualOffer = verifyOfferExists(createdOffer);
+        assertThat(actualOffer)
+                .hasExpires(expires);
+        verifyTtl(testStartTime, actualOffer);
+    }
+
+    private Offer makeRequestWithExpiry(final LocalDateTime expires) {
+        final Offer offer = new Offer(DESCRIPTION, PRICE, CURRENCY, expires);
+        final Offer createdOffer = getClient().create(offer);
+        return createdOffer;
+    }
+
+    private void verifyTtl(final LocalDateTime testStartTime, final Offer actualOffer) {
+        final LocalDateTime expires = actualOffer.getExpires();
+        final long ceilTtlSecs = Duration.between(testStartTime, expires).toMillis() / MILLIS_IN_SECONDS;
+        final long floorTtlSecs = Duration.between(LocalDateTime.now(), expires).toMillis() / MILLIS_IN_SECONDS - 1;
+        final long ttlSecs = actualOffer.getTtl() / MILLIS_IN_SECONDS;
+
+        assertThat(ttlSecs).isBetween(floorTtlSecs, ceilTtlSecs);
+    }
+
+    private Offer verifyOfferExists(final Offer createdOffer) {
+        assertThat(createdOffer.getId()).isNotNull();
+        final Optional<Offer> offerInRepo = offerRepo.findById(createdOffer.getId());
+        assertThat(offerInRepo).isPresent();
+        return offerInRepo.get();
     }
 
 }

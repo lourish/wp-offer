@@ -1,16 +1,14 @@
 package com.lourish.wpoffer.domain;
 
-import static com.lourish.wpoffer.TimeUtils.asSeconds;
-
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
@@ -24,33 +22,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 @RedisHash("offers")
-public final class Offer {
+public class Offer {
 
-    @JsonProperty
-    @Id
     private String id;
 
-    @JsonProperty
     @NotBlank
     private String desc;
-    @JsonProperty
     @NotNull
     @Min(0)
     private BigDecimal price;
-    @JsonProperty
     @NotBlank
     private String currency;
-    @JsonProperty
     @NotNull
     private LocalDateTime expires;
 
     /**
      * @return time until expiry in seconds (negative if passed)
      */
-    @TimeToLive
-    public long getTimeToLive() {
-        return asSeconds(Duration.between(LocalDateTime.now(), expires).toMillis());
-    }
+    @TimeToLive(unit = TimeUnit.MILLISECONDS)
+    @Min(0)
+    private Long ttl;
 
     protected Offer() {
         // For framework support
@@ -61,14 +52,13 @@ public final class Offer {
         this.desc = o.desc;
         this.price = o.price;
         this.currency = o.currency;
+        this.expires = o.expires;
+        this.ttl = o.ttl;
     }
 
     /**
      * Create an offer without an id
      *
-     * @param desc
-     * @param price
-     * @param currency
      */
     public Offer(final String desc, final BigDecimal price, final String currency, final LocalDateTime expires) {
         id = null;
@@ -76,17 +66,19 @@ public final class Offer {
         this.price = price;
         this.currency = currency;
         this.expires = expires;
+        this.ttl = calculateTtl(expires);
     }
 
     @JsonCreator
     public Offer(@JsonProperty("id") final String id, @JsonProperty("desc") final String desc,
             @JsonProperty("price") final BigDecimal price, @JsonProperty("currency") final String currency,
             @JsonProperty("expires") final LocalDateTime expires) {
+        this(desc, price, currency, expires);
         this.id = id;
-        this.desc = desc;
-        this.price = price;
-        this.currency = currency;
-        this.expires = expires;
+    }
+
+    public Long getTtl() {
+        return ttl;
     }
 
     public String getId() {
@@ -133,6 +125,17 @@ public final class Offer {
         return newOffer;
     }
 
+    public Offer withExpires(final LocalDateTime expiry) {
+        final Offer newOffer = new Offer(this);
+        newOffer.expires = expiry;
+        newOffer.ttl = calculateTtl(expires);
+        return newOffer;
+    }
+
+    private long calculateTtl(final LocalDateTime expires) {
+        return Duration.between(LocalDateTime.now(), expires).toMillis();
+    }
+
     @Override
     public String toString() {
         return "Offer [id=" + id
@@ -144,6 +147,8 @@ public final class Offer {
                 + currency
                 + ", expires="
                 + expires
+                + ", ttl="
+                + ttl
                 + "]";
     }
 

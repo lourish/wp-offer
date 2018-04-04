@@ -7,7 +7,6 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @SpringBootApplication
 @EnableRedisRepositories
@@ -15,9 +14,10 @@ public class WpOfferApplication {
 
     @Bean
     public ObjectMapper objectMapper() {
-        final ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule());
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
         return mapper;
 
     }

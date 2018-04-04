@@ -144,22 +144,22 @@ public class OfferAssert extends AbstractObjectAssert<OfferAssert, Offer> {
   }
 
   /**
-   * Verifies that the actual Offer's timeToLive is equal to the given one.
-   * @param timeToLive the given timeToLive to compare the actual Offer's timeToLive to.
+   * Verifies that the actual Offer's ttl is equal to the given one.
+   * @param ttl the given ttl to compare the actual Offer's ttl to.
    * @return this assertion object.
-   * @throws AssertionError - if the actual Offer's timeToLive is not equal to the given one.
+   * @throws AssertionError - if the actual Offer's ttl is not equal to the given one.
    */
-  public OfferAssert hasTimeToLive(long timeToLive) {
+  public OfferAssert hasTtl(Long ttl) {
     // check that actual Offer we want to make assertions on is not null.
     isNotNull();
 
     // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpecting timeToLive of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+    String assertjErrorMessage = "\nExpecting ttl of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
-    // check
-    long actualTimeToLive = actual.getTimeToLive();
-    if (actualTimeToLive != timeToLive) {
-      failWithMessage(assertjErrorMessage, actual, timeToLive, actualTimeToLive);
+    // null safe check
+    Long actualTtl = actual.getTtl();
+    if (!Objects.areEqual(actualTtl, ttl)) {
+      failWithMessage(assertjErrorMessage, actual, ttl, actualTtl);
     }
 
     // return the current assertion for method chaining

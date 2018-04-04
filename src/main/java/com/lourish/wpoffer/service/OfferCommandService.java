@@ -15,10 +15,11 @@ import com.lourish.wpoffer.repository.redis.OfferRepository;
 public class OfferCommandService {
 
     private final OfferRepository repository;
+    private final IdGenerator idGenerator;
 
-    public OfferCommandService(final OfferRepository repository) {
+    public OfferCommandService(final IdGenerator idGenerator, final OfferRepository repository) {
+        this.idGenerator = idGenerator;
         this.repository = repository;
-
     }
 
     /**
@@ -27,7 +28,11 @@ public class OfferCommandService {
      * @return Created offer
      */
     public Offer createOffer(final Offer offer) {
-        return repository.save(offer);
+        return repository.save(offer.withId(idGenerator.generateId(offer)));
+    }
+
+    public void deleteById(final String offerId) {
+        repository.deleteById(offerId);
     }
 
 }

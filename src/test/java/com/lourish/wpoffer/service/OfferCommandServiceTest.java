@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import com.lourish.wpoffer.domain.Offer;
 import com.lourish.wpoffer.domain.Offers;
-import com.lourish.wpoffer.service.OfferCommandService;
 
 public class OfferCommandServiceTest {
 
@@ -17,7 +16,7 @@ public class OfferCommandServiceTest {
 
     @Before
     public void setUp() {
-        service = new OfferCommandService(repository);
+        service = new OfferCommandService(new StubIdGenerator(STUB_ID), repository);
     }
 
     @Test

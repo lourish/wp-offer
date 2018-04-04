@@ -29,7 +29,7 @@ import com.lourish.wpoffer.domain.Offer;
 import com.lourish.wpoffer.service.OfferCommandService;
 import com.lourish.wpoffer.test.JsonTemplates;
 
-public class CreateOfferRestControllerTest {
+public class UpdateOfferRestControllerTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
@@ -37,16 +37,16 @@ public class CreateOfferRestControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private OfferCommandService offerCommandService;
+    private OfferCommandService offerService;
 
     @Captor
     private ArgumentCaptor<Offer> offerCaptor;
 
-    private CreateOfferRestController createOfferController;
+    private UpdateOfferRestController createOfferController;
 
     @Before
     public void setUp() {
-        createOfferController = new CreateOfferRestController(offerCommandService);
+        createOfferController = new UpdateOfferRestController(offerService);
         mockMvc = MockMvcBuilders.standaloneSetup(createOfferController).build();
     }
 
@@ -66,7 +66,7 @@ public class CreateOfferRestControllerTest {
         final String currency = "GBP";
         final LocalDateTime expires = LocalDateTime.now().plusHours(1);
         final Offer returnedOffer = new Offer(id, description, price, currency, expires);
-        given(offerCommandService.createOffer(any(Offer.class))).willReturn(returnedOffer);
+        given(offerService.createOffer(any(Offer.class))).willReturn(returnedOffer);
 
         // when
         mockMvc.perform(post("/offers").content(JsonTemplates.offer(description, price, currency, expires))
@@ -79,7 +79,7 @@ public class CreateOfferRestControllerTest {
                 .andExpect(jsonPath("price", is(1.23)))
                 .andExpect(jsonPath("currency", is(currency)));
 
-        verify(offerCommandService).createOffer(offerCaptor.capture());
+        verify(offerService).createOffer(offerCaptor.capture());
         assertThat(offerCaptor.getValue()).hasDesc(description)
                 .hasPrice(price)
                 .hasCurrency(currency)
