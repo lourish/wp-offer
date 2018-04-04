@@ -18,7 +18,7 @@ public abstract class AbstractDocumentingApiControllerTest {
     @Rule
     public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("target/generated-snippets");
     @Rule
-    public MockitoRule mockRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+    public final MockitoRule mockRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     protected MockMvc mockMvc;
 

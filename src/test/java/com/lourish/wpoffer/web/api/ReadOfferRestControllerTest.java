@@ -25,12 +25,12 @@ import org.springframework.http.MediaType;
 
 import com.lourish.wpoffer.domain.Offer;
 import com.lourish.wpoffer.domain.Offers;
-import com.lourish.wpoffer.repository.redis.OfferRepository;
+import com.lourish.wpoffer.service.OfferReadService;
 
 public class ReadOfferRestControllerTest extends AbstractDocumentingApiControllerTest {
 
     @Mock
-    private OfferRepository offerRepo;
+    private OfferReadService offerReadService;
 
     @Captor
     private ArgumentCaptor<Offer> offerCaptor;
@@ -39,7 +39,7 @@ public class ReadOfferRestControllerTest extends AbstractDocumentingApiControlle
 
     @Before
     public void setUp() {
-        controller = new ReadOfferRestController(offerRepo);
+        controller = new ReadOfferRestController(offerReadService);
         setUpDocumentingMockMvc(controller);
     }
 
@@ -47,7 +47,7 @@ public class ReadOfferRestControllerTest extends AbstractDocumentingApiControlle
     public void listOffers() throws Exception {
         // given
         final Offer returnedOffer = Offers.offerWithId();
-        given(offerRepo.findAll()).willReturn(asList(returnedOffer));
+        given(offerReadService.findCurrentOffers()).willReturn(asList(returnedOffer));
 
         // when
         mockMvc.perform(get("/offers")
@@ -70,7 +70,7 @@ public class ReadOfferRestControllerTest extends AbstractDocumentingApiControlle
     public void getOffer() throws Exception {
         // given
         final Offer returnedOffer = Offers.offerWithId();
-        given(offerRepo.findById(anyString())).willReturn(Optional.of(returnedOffer));
+        given(offerReadService.findById(anyString())).willReturn(Optional.of(returnedOffer));
 
         // when
         mockMvc.perform(get("/offers/id/{id}", "an-offer-id"))
