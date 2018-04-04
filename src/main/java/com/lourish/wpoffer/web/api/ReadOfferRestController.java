@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lourish.wpoffer.domain.Offer;
 import com.lourish.wpoffer.repository.redis.OfferRepository;
 
+/**
+ * Read-only operations
+ * 
+ * @author dave
+ *
+ */
 @RestController
 public class ReadOfferRestController {
 

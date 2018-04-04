@@ -7,6 +7,9 @@
 # BlueJ files
 *.ctxt
 
+#jrebel
+rebel.xml
+
 # Eclipse
 .classpath
 .project

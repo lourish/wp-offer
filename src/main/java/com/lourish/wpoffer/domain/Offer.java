@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Immutable offer
+ * Offer suitable for JSON serialisation and REDIS storage
  *
  * @author dave
  *

@@ -9,6 +9,16 @@ import org.springframework.stereotype.Component;
 
 import com.lourish.wpoffer.domain.Offer;
 
+/**
+ * ID generator which uses the MD5 hash of the currency, price, description and
+ * expiry fields to create an id for an offer. The same id will be created for
+ * any offer with the same values for the fields.
+ *
+ * Requires MD5 MessageDigest
+ *
+ * @author dave
+ *
+ */
 @Component
 public class Md5IdGenerator implements IdGenerator {
 

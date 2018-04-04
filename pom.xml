@@ -87,7 +87,6 @@
 					<generateJUnitSoftAssertions>false</generateJUnitSoftAssertions>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 

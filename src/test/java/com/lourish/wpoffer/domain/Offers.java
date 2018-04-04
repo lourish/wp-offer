@@ -11,4 +11,9 @@ public final class Offers {
     public static Offer offerWithoutId() {
         return new Offer("desc", new BigDecimal("1.23"), "currency", LocalDateTime.now().plusHours(1));
     }
+
+    public static Offer offerWithId() {
+        return new Offer("an-id", "desc", new BigDecimal("1.23"), "currency", LocalDateTime.now().plusHours(1));
+    }
+
 }

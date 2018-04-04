@@ -23,7 +23,7 @@ public class OfferCommandService {
     }
 
     /**
-     * Create an offer after providing an ID
+     * Create an offer after providing it an ID
      *
      * @return Created offer
      */
@@ -31,6 +31,11 @@ public class OfferCommandService {
         return repository.save(offer.withId(idGenerator.generateId(offer)));
     }
 
+    /**
+     * Remove an offer if it exists. Does nothing if it does not exist
+     *
+     * @param offerId
+     */
     public void deleteById(final String offerId) {
         repository.deleteById(offerId);
     }
